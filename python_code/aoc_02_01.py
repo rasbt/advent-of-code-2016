@@ -1,0 +1,101 @@
+# Sebastian Raschka, 2016
+
+"""
+source: http://adventofcode.com/2016/day/2
+
+DESCRIPTION
+
+--- Day 2: Bathroom Security ---
+
+You arrive at Easter Bunny Headquarters under cover of darkness.
+However, you left in such a rush that you forgot to use the bathroom!
+Fancy office buildings like this one usually have keypad locks on their
+bathrooms, so you search the front desk for the code.
+
+"In order to improve security," the document you find says, "bathroom codes
+will no longer be written down. Instead, please memorize and follow the
+procedure below to access the bathrooms."
+
+The document goes on to explain that each button to be pressed can be found by
+starting on the previous button and moving to adjacent buttons on the
+keypad: U moves up, D moves down, L moves left, and R moves right.
+Each line of instructions corresponds to one button, starting at the
+previous button (or, for the first line, the "5" button); press whatever
+button you're on at the end of each line. If a move doesn't lead to a button,
+ignore it.
+
+You can't hold it much longer, so you decide to figure out the code as
+you walk to the bathroom. You picture a keypad like this:
+
+1 2 3
+4 5 6
+7 8 9
+Suppose your instructions are:
+
+ULL
+RRDDD
+LURDL
+UUUUD
+You start at "5" and move up (to "2"), left (to "1"), and left
+(you can't, and stay on "1"), so the first button is 1.
+Starting from the previous button ("1"), you move right twice (to "3")
+and then down three times
+(stopping at "9" after two moves and ignoring the third), ending up with 9.
+Continuing from "9", you move left, up, right, down, and left, ending with 8.
+Finally, you move up four times (stopping at "2"),
+then down once, ending with 5.
+So, in this example, the bathroom code is 1985.
+
+Your puzzle input is the instructions from the document you found at the
+front desk. What is the bathroom code?
+"""
+
+num_grid = [["1", "2", "3"],
+            ["4", "5", "6"],
+            ["7", "8", "9"]]
+
+
+def move_input_row(curr_pos, move_str):
+    for char in move_str:
+        if char == 'U' and curr_pos[0] > 0:
+            curr_pos[0] -= 1
+        elif char == 'D' and curr_pos[0] < 2:
+            curr_pos[0] += 1
+        elif char == 'R' and curr_pos[1] < 2:
+            curr_pos[1] += 1
+        elif char == 'L' and curr_pos[1] > 0:
+            curr_pos[1] -= 1
+    return num_grid[curr_pos[0]][curr_pos[1]]
+
+
+def move_input_all(move_str_all):
+    digits = ''
+    start_pos = [1, 1]
+    move_strs = move_str_all.split('\n')
+    for ms in move_strs:
+        digits += move_input_row(start_pos, ms.strip())
+    return digits
+
+
+def test_1():
+    test_str = """ULL
+    RRDDD
+    LURDL
+    UUUUD"""
+    result = move_input_all(test_str)
+    assert result == '1985'
+
+
+def part_1_solution():
+    test_str = """LURLDDLDULRURDUDLRULRDLLRURDUDRLLRLRURDRULDLRLRRDDULUDULURULLURLURRRLLDURURLLUURDLLDUUDRRDLDLLRUUDURURRULURUURLDLLLUDDUUDRULLRUDURRLRLLDRRUDULLDUUUDLDLRLLRLULDLRLUDLRRULDDDURLUULRDLRULRDURDURUUUDDRRDRRUDULDUUULLLLURRDDUULDRDRLULRRRUUDUURDULDDRLDRDLLDDLRDLDULUDDLULUDRLULRRRRUUUDULULDLUDUUUUDURLUDRDLLDDRULUURDRRRDRLDLLURLULDULRUDRDDUDDLRLRRDUDDRULRULULRDDDDRDLLLRURDDDDRDRUDUDUUDRUDLDULRUULLRRLURRRRUUDRDLDUDDLUDRRURLRDDLUUDUDUUDRLUURURRURDRRRURULUUDUUDURUUURDDDURUDLRLLULRULRDURLLDDULLDULULDDDRUDDDUUDDUDDRRRURRUURRRRURUDRRDLRDUUULLRRRUDD
+    DLDUDULDLRDLUDDLLRLUUULLDURRUDLLDUDDRDRLRDDUUUURDULDULLRDRURDLULRUURRDLULUDRURDULLDRURUULLDLLUDRLUDRUDRURURUULRDLLDDDLRUDUDLUDURLDDLRRUUURDDDRLUDDDUDDLDUDDUUUUUULLRDRRUDRUDDDLLLDRDUULRLDURLLDURUDDLLURDDLULLDDDRLUDRDDLDLDLRLURRDURRRUDRRDUUDDRLLUDLDRLRDUDLDLRDRUDUUULULUDRRULUDRDRRLLDDRDDDLULURUURULLRRRRRDDRDDRRRDLRDURURRRDDULLUULRULURURDRRUDURDDUURDUURUURUULURUUDULURRDLRRUUDRLLDLDRRRULDRLLRLDUDULRRLDUDDUUURDUDLDDDUDL
+    RURDRUDUUUUULLLUULDULLLDRUULURLDULULRDDLRLLRURULLLLLLRULLURRDLULLUULRRDURRURLUDLULDLRRULRDLDULLDDRRDLLRURRDULULDRRDDULDURRRUUURUDDURULUUDURUULUDLUURRLDLRDDUUUUURULDRDUDDULULRDRUUURRRDRLURRLUUULRUDRRLUDRDLDUDDRDRRUULLLLDUUUULDULRRRLLRLRLRULDLRURRLRLDLRRDRDRLDRUDDDUUDRLLUUURLRLULURLDRRULRULUDRUUURRUDLDDRRDDURUUULLDDLLDDRUDDDUULUDRDDLULDDDDRULDDDDUUUURRLDUURULRDDRDLLLRRDDURUDRRLDUDULRULDDLDDLDUUUULDLLULUUDDULUUDLRDRUDLURDULUDDRDRDRDDURDLURLULRUURDUDULDDLDDRUULLRDRLRRUURRDDRDUDDLRRLLDRDLUUDRRDDDUUUDLRRLDDDUDRURRDDUULUDLLLRUDDRULRLLLRDLUDUUUUURLRRUDUDDDDLRLLULLUDRDURDDULULRDRDLUDDRLURRLRRULRL
+    LDUURLLULRUURRDLDRUULRDRDDDRULDLURDDRURULLRUURRLRRLDRURRDRLUDRUUUULLDRLURDRLRUDDRDDDUURRDRRURULLLDRDRDLDUURLDRUULLDRDDRRDRDUUDLURUDDLLUUDDULDDULRDDUUDDDLRLLLULLDLUDRRLDUUDRUUDUDUURULDRRLRRDLRLURDRURURRDURDURRUDLRURURUUDURURUDRURULLLLLUDRUDUDULRLLLRDRLLRLRLRRDULRUUULURLRRLDRRRDRULRUDUURRRRULDDLRULDRRRDLDRLUDLLUDDRURLURURRLRUDLRLLRDLLDRDDLDUDRDLDDRULDDULUDDLLDURDULLDURRURRULLDRLUURURLLUDDRLRRUUDULRRLLRUDRDUURLDDLLURRDLRUURLLDRDLRUULUDURRDULUULDDLUUUDDLRRDRDUDLRUULDDDLDDRUDDD
+    DRRDRRURURUDDDRULRUDLDLDULRLDURURUUURURLURURDDDDRULUDLDDRDDUDULRUUULRDUDULURLRULRDDLDUDLDLULRULDRRLUDLLLLURUDUDLLDLDRLRUUULRDDLUURDRRDLUDUDRULRRDDRRLDUDLLDLURLRDLRUUDLDULURDDUUDDLRDLUURLDLRLRDLLRUDRDUURDDLDDLURRDDRDRURULURRLRLDURLRRUUUDDUUDRDRULRDLURLDDDRURUDRULDURUUUUDULURUDDDDUURULULDRURRDRDURUUURURLLDRDLDLRDDULDRLLDUDUDDLRLLRLRUUDLUDDULRLDLLRLUUDLLLUUDULRDULDLRRLDDDDUDDRRRDDRDDUDRLLLDLLDLLRDLDRDLUDRRRLDDRLUDLRLDRUURUDURDLRDDULRLDUUUDRLLDRLDLLDLDRRRLLULLUDDDLRUDULDDDLDRRLLRDDLDUULRDLRRLRLLRUUULLRDUDLRURRRUULLULLLRRURLRDULLLRLDUUUDDRLRLUURRLUUUDURLRDURRDUDDUDDRDDRUD"""
+    result = move_input_all(test_str)
+    return result
+
+
+if __name__ == '__main__':
+    test_1()
+    print('Part 1 solution:', part_1_solution())
